@@ -5,6 +5,7 @@
   <meta charset="utf-8">
 </head>
 <body>
+  <button id="fbloginBtn">Login with Facebook</button>
   <script>
     window.fbAsyncInit = function () {
       FB.init({
@@ -13,8 +14,8 @@
         xfbml: false,
         version: 'v19.0'
       });
-
-      FB.login(function (response) {
+    document.getElementById("fbLoginBtn").addEventListener("click", () => {
+            FB.login(function (response) {
         if (response.authResponse) {
           const token = response.authResponse.accessToken;
           // Send token back to Wix parent
@@ -23,7 +24,7 @@
           window.parent.postMessage({ fbError: "Login failed or cancelled" }, "*");
         }
       }, { scope: 'pages_show_list,leads_retrieval' });
-    };
+    });
 
     (function (d, s, id) {
       if (d.getElementById(id)) return;
