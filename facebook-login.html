@@ -1,30 +1,25 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
   <title>Facebook Login</title>
-  <meta charset="utf-8">
 </head>
 <body>
+
+  <h2>Connect to Facebook</h2>
   <button id="fbloginBtn">Login with Facebook</button>
+
   <script>
+    // 1. Load SDK
     window.fbAsyncInit = function () {
       FB.init({
-        appId: '2249713595442874',
+        appId: 'YOUR_APP_ID', // Replace with yours
         cookie: true,
         xfbml: false,
         version: 'v19.0'
       });
-    document.getElementById("fbLoginBtn").addEventListener("click", () => {
-            FB.login(function (response) {
-        if (response.authResponse) {
-          const token = response.authResponse.accessToken;
-          // Send token back to Wix parent
-          window.parent.postMessage({ fbToken: token }, "*");
-        } else {
-          window.parent.postMessage({ fbError: "Login failed or cancelled" }, "*");
-        }
-      }, { scope: 'pages_show_list,leads_retrieval' });
-    });
+      console.log("✅ FB SDK initialized");
+    };
 
     (function (d, s, id) {
       if (d.getElementById(id)) return;
@@ -33,6 +28,32 @@
       var fjs = d.getElementsByTagName(s)[0];
       fjs.parentNode.insertBefore(js, fjs);
     }(document, 'script', 'facebook-jssdk'));
+
+    // 2. Delay button binding until DOM is ready
+    document.addEventListener("DOMContentLoaded", () => {
+      const btn = document.getElementById("fbloginBtn");
+      if (btn) {
+        btn.addEventListener("click", () => {
+          if (typeof FB === 'undefined') {
+            alert("⚠️ FB SDK not ready. Try again.");
+            return;
+          }
+
+          console.log("🔵 FB.login starting...");
+          FB.login(function (response) {
+            if (response.authResponse) {
+              const token = response.authResponse.accessToken;
+              console.log("✅ Token received:", token);
+              window.parent.postMessage({ fbToken: token }, "*");
+            } else {
+              console.warn("❌ Login cancelled");
+              window.parent.postMessage({ fbError: "Login cancelled" }, "*");
+            }
+          }, { scope: 'pages_show_list,leads_retrieval' });
+        });
+      }
+    });
   </script>
+
 </body>
 </html>
