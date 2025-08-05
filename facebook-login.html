@@ -1,15 +1,18 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8" />
   <title>Facebook Login</title>
 </head>
 <body>
+  <h2>Login with Facebook</h2>
   <button id="fbloginBtn">Login with Facebook</button>
 
   <script>
+    // Load Facebook SDK
     window.fbAsyncInit = function () {
       FB.init({
-        appId: '2249713595442874', // Replace with your real App ID
+        appId: '2249713595442874', // 🔁 Replace with your app ID
         cookie: true,
         xfbml: false,
         version: 'v19.0'
@@ -18,7 +21,6 @@
       console.log("✅ FB SDK Initialized");
     };
 
-    // Load FB SDK
     (function (d, s, id) {
       if (d.getElementById(id)) return;
       const js = d.createElement(s); js.id = id;
@@ -27,27 +29,27 @@
       fjs.parentNode.insertBefore(js, fjs);
     })(document, 'script', 'facebook-jssdk');
 
-    // 🔒 Login button click
+    // Handle Facebook login button click
     document.getElementById("fbloginBtn").addEventListener("click", () => {
       console.log("🟢 FB Login button clicked");
 
-      FB.login(function (response) {
+      FB.login(response => {
         if (response.authResponse) {
           const token = response.authResponse.accessToken;
-          console.log("✅ Got token:", token);
+          console.log("✅ Token:", token);
           window.parent.postMessage({ fbToken: token }, "*");
         } else {
-          console.warn("❌ Login failed or canceled");
+          console.warn("❌ Login canceled");
           window.parent.postMessage({ fbError: "Login failed" }, "*");
         }
       }, { scope: "pages_show_list,leads_retrieval" });
     });
 
-    // 🧼 Listen for Lightbox close command
-    window.addEventListener("message", (event) => {
+    // Optional: Listen for Lightbox close command
+    window.addEventListener("message", event => {
       if (event.data?.command === "closeLightbox") {
-        console.log("🛑 Closing Lightbox...");
-        window.close(); // Tells Wix to close the Lightbox
+        console.log("🔒 Lightbox close requested");
+        window.close(); // May or may not be allowed depending on browser
       }
     });
   </script>
