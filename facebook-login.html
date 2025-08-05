@@ -44,7 +44,13 @@
             if (response.authResponse) {
               const token = response.authResponse.accessToken;
               console.log("✅ Token received:", token);
+              // After successful login and token retrieval
               window.parent.postMessage({ fbToken: token }, "*");
+              
+              // 🔁 Optional: delay Lightbox close slightly (optional)
+              setTimeout(() => {
+                window.close(); // This tells wix Lightbox to close
+              }, 500);
             } else {
               console.warn("❌ Login cancelled");
               window.parent.postMessage({ fbError: "Login cancelled" }, "*");
