@@ -1,65 +1,55 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
   <title>Facebook Login</title>
 </head>
 <body>
-
-  <h2>Connect to Facebook</h2>
   <button id="fbloginBtn">Login with Facebook</button>
 
   <script>
-    // 1. Load SDK
     window.fbAsyncInit = function () {
       FB.init({
-        appId: '2249713595442874', // Replace with actual App ID.
+        appId: '2249713595442874', // Replace with your real App ID
         cookie: true,
         xfbml: false,
         version: 'v19.0'
       });
-      console.log("✅ FB SDK initialized");
+
+      console.log("✅ FB SDK Initialized");
     };
 
+    // Load FB SDK
     (function (d, s, id) {
       if (d.getElementById(id)) return;
-      var js = d.createElement(s); js.id = id;
+      const js = d.createElement(s); js.id = id;
       js.src = "https://connect.facebook.net/en_US/sdk.js";
-      var fjs = d.getElementsByTagName(s)[0];
+      const fjs = d.getElementsByTagName(s)[0];
       fjs.parentNode.insertBefore(js, fjs);
-    }(document, 'script', 'facebook-jssdk'));
+    })(document, 'script', 'facebook-jssdk');
 
-    // 2. Delay button binding until DOM is ready
-    document.addEventListener("DOMContentLoaded", () => {
-      const btn = document.getElementById("fbloginBtn");
-      if (btn) {
-        btn.addEventListener("click", () => {
-          if (typeof FB === 'undefined') {
-            alert("⚠️ FB SDK not ready. Try again.");
-            return;
-          }
+    // 🔒 Login button click
+    document.getElementById("fbloginBtn").addEventListener("click", () => {
+      console.log("🟢 FB Login button clicked");
 
-          console.log("🔵 FB.login starting...");
-          FB.login(function (response) {
-            if (response.authResponse) {
-              const token = response.authResponse.accessToken;
-              console.log("✅ Token received:", token);
-              // After successful login and token retrieval
-              window.parent.postMessage({ fbToken: token }, "*");
-              
-              // 🔁 Optional: delay Lightbox close slightly (optional)
-              setTimeout(() => {
-                window.close(); // This tells wix Lightbox to close
-              }, 500);
-            } else {
-              console.warn("❌ Login cancelled");
-              window.parent.postMessage({ fbError: "Login cancelled" }, "*");
-            }
-          }, { scope: 'pages_show_list,leads_retrieval' });
-        });
+      FB.login(function (response) {
+        if (response.authResponse) {
+          const token = response.authResponse.accessToken;
+          console.log("✅ Got token:", token);
+          window.parent.postMessage({ fbToken: token }, "*");
+        } else {
+          console.warn("❌ Login failed or canceled");
+          window.parent.postMessage({ fbError: "Login failed" }, "*");
+        }
+      }, { scope: "pages_show_list,leads_retrieval" });
+    });
+
+    // 🧼 Listen for Lightbox close command
+    window.addEventListener("message", (event) => {
+      if (event.data?.command === "closeLightbox") {
+        console.log("🛑 Closing Lightbox...");
+        window.close(); // Tells Wix to close the Lightbox
       }
     });
   </script>
-
 </body>
 </html>
