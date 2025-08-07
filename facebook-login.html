@@ -49,8 +49,6 @@
         FB.login(function (response) {
           if (response.authResponse) {
             const token = response.authResponse.accessToken;
-            console.log("✅ Token:", token);
-            console.log("📨 Sending token to parent");
             window.parent.postMessage({ fbToken: token }, "*");
           } else {
             console.warn("❌ Login failed or cancelled");
