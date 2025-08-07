@@ -2,95 +2,43 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Facebook Login</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding-top: 50px;
-    }
-
-    #fbloginBtn {
-      padding: 12px 20px;
-      font-size: 16px;
-      background-color: #1877f2;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    #fbloginBtn:hover {
-      background-color: #145dbf;
-    }
-
-    #status {
-      margin-top: 20px;
-      font-weight: bold;
-    }
-  </style>
-</head>
-<body>
-  <h2>Login with Facebook1</h2>
-  <button id="fbloginBtn">Login with Facebook</button>
-  <div id="status"></div>
-
-  <!-- Load Facebook SDK -->
   <script>
-    // Set up the async loader
     window.fbAsyncInit = function () {
       FB.init({
-        appId: '2249713595442874',  // ← Replace with your actual App ID
+        appId: '2249713595442874', // Your real FB App ID
         cookie: true,
         xfbml: false,
         version: 'v19.0'
       });
-
-      console.log("✅ FB SDK initialized");
     };
 
     (function (d, s, id) {
       if (d.getElementById(id)) return;
-      const js = d.createElement(s);
-      js.id = id;
+      let js = d.createElement(s); js.id = id;
       js.src = "https://connect.facebook.net/en_US/sdk.js";
-      const fjs = d.getElementsByTagName(s)[0];
+      let fjs = d.getElementsByTagName(s)[0];
       fjs.parentNode.insertBefore(js, fjs);
     }(document, 'script', 'facebook-jssdk'));
-  </script>
 
-  <!-- FB Login Logic -->
-  <script>
-    const statusDiv = document.getElementById("status");
-
-    function sendToWix(data) {
-      window.parent.postMessage(data, "*");
-      statusDiv.textContent = "📤 Token sent to Wix...";
-    }
-
-    function loginWithFacebook() {
-      if (typeof FB === 'undefined') {
-        console.warn("⚠️ FB SDK not ready");
-        statusDiv.textContent = "❌ Facebook SDK not ready. Please refresh.";
-        return;
-      }
-
+    function loginWithFB() {
       FB.login(function (response) {
-        console.log("📩 FB.login response:", response);
-
         if (response.authResponse) {
           const token = response.authResponse.accessToken;
-          console.log("✅ Got token:", token);
-          sendToWix({ fbToken: token });
+          // Send to parent (Wix Lightbox)
+          window.parent.postMessage({ fbToken: token }, "*");
         } else {
-          console.log("❌ User cancelled login or did not authorize.");
-          sendToWix({ fbError: "Login failed or cancelled" });
+          window.parent.postMessage({ fbError: "Login cancelled" }, "*");
         }
-      }, { scope: "pages_show_list,leads_retrieval" });
+      }, { scope: 'pages_show_list,leads_retrieval' });
     }
 
-    document.getElementById("fbloginBtn").addEventListener("click", loginWithFacebook);
+    window.onload = function () {
+      document.getElementById("loginBtn").onclick = loginWithFB;
+    }
   </script>
+</head>
+<body>
+  <button id="loginBtn">Login with Facebook</button>
 </body>
 </html>
