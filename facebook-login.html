@@ -43,7 +43,6 @@
       document.getElementById('fbloginBtn').disabled = false;
 
       document.getElementById('fbloginBtn').addEventListener('click', () => {
-        console.log("🟦 Facebook login clicked");
         FB.login(function (response) {
           if (response.authResponse) {
             const token = response.authResponse.accessToken;
