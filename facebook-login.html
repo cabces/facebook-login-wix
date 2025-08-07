@@ -1,22 +1,66 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8" />
   <title>Facebook Login</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 100px;
+    }
+
+    #fbloginBtn {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #1877f2;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    #fbloginBtn:hover {
+      background-color: #145dbf;
+    }
+  </style>
 </head>
 <body>
-  <button onclick="loginWithFacebook()">Login with Facebook</button>
+  <h2>Login with Facebook</h2>
+  <button id="fbloginBtn" disabled>Login with Facebook</button>
 
   <script>
+    // Facebook SDK Initialization
     window.fbAsyncInit = function () {
       FB.init({
-        appId: '2249713595442874',
+        appId: '2249713595442874', // <-- Replace with your actual App ID
         cookie: true,
         xfbml: true,
         version: 'v19.0'
       });
+
       console.log("✅ FB SDK initialized");
+
+      // Enable the button once SDK is ready
+      document.getElementById('fbloginBtn').disabled = false;
+
+      document.getElementById('fbloginBtn').addEventListener('click', () => {
+        console.log("🟦 Facebook login clicked");
+        FB.login(function (response) {
+          if (response.authResponse) {
+            const token = response.authResponse.accessToken;
+            console.log("✅ Token:", token);
+            console.log("📨 Sending token to parent");
+            window.parent.postMessage({ fbToken: token }, "*");
+          } else {
+            console.warn("❌ Login failed or cancelled");
+            window.parent.postMessage({ fbError: 'Login canceled or failed' }, "*");
+          }
+        }, { scope: 'pages_show_list,leads_retrieval,pages_read_engagement' });
+      });
     };
 
+    // Load the SDK
     (function (d, s, id) {
       if (d.getElementById(id)) return;
       const js = d.createElement(s); js.id = id;
@@ -24,19 +68,6 @@
       const fjs = d.getElementsByTagName(s)[0];
       fjs.parentNode.insertBefore(js, fjs);
     }(document, 'script', 'facebook-jssdk'));
-
-    function loginWithFacebook() {
-      FB.login(function (response) {
-        if (response.authResponse) {
-          const token = response.authResponse.accessToken;
-          console.log("✅ Token:", token);
-          console.log("📨 Sending token to parent");
-          window.parent.postMessage({ fbToken: token }, "*");
-        } else {
-          window.parent.postMessage({ fbError: "Login cancelled or failed" }, "*");
-        }
-      }, { scope: 'pages_show_list,leads_retrieval' });
-    }
   </script>
 </body>
 </html>
