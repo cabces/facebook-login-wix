@@ -46,6 +46,11 @@
         FB.login(function (response) {
           if (response.authResponse) {
             const token = response.authResponse.accessToken;
+            const expiresIn = response.authResponse.expiresIn;
+            const expiresAt = Date.now() + expiresIn * 1000;
+            console.log("Token:", token);
+            console.log("Expires In (seconds):", expiresIn);
+            console.log("Expires At (Date):", new Date(expiresAt));
             window.parent.postMessage({ fbToken: token }, "*");
           } else {
             console.warn("❌ Login failed or cancelled");
